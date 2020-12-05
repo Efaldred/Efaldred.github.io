@@ -192,8 +192,8 @@ div.footer{
   border-bottom: 5px solid #f8971f;;
 }
 /* Set the fixed height of the footer here */
-/*.footer {
-  height: 50px;
-  padding-bottom: 15px;
+.footer {
+  height: 5px;
+  padding-bottom: 5px;
   
-}*/
+}
