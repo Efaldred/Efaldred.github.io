@@ -1,0 +1,14 @@
+---
+title: Comp-bio Projects
+author: ''
+date: '2020-12-05'
+slug: comp-bio-projects
+categories: []
+tags: []
+description: ''
+---
+[Link to project 1](projects/project1/)
+
+[Link to project 2](projects/project2/)
+
+[Link to google](https://www.google.com)
