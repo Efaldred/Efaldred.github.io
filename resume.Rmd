@@ -8,7 +8,7 @@ hidediscus: true
 
 <center>
 <object data="/resume.pdf" type="application/pdf" >
-<embed src="/resume.pdf" type="application/pdf" style="min-height:200vh;width:100vw" />
+<embed src="/resume.pdf" type="application/pdf" style="min-height:100%;width:100%" />
 </object>
 </center>
 
