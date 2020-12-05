@@ -19,15 +19,6 @@ Link to google</description>
     </item>
     
     <item>
-      <title>Project 2</title>
-      <link>/project/project2/</link>
-      <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/project/project2/</guid>
-      <description>  Test Project 2  </description>
-    </item>
-    
-    <item>
       <title>Project 1: State Crime</title>
       <link>/project/project1/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -35,6 +26,16 @@ Link to google</description>
       <guid>/project/project1/</guid>
       <description>Introduction
 This project analyzes portions of three datasets that provide information on all of the 50 US states, excluding the District of Columbia. Each datset provides either information on crime, car crashes, or population statistics in each state. I chose these datasets because I wanted to see if there was a connection between state statistics (income, illiteracy, etc), reckless driving, and/or crime. I expected that with more poverty, less education, and higher urban populations I would find more crime and reckless driving.</description>
+    </item>
+    
+    <item>
+      <title>Project2</title>
+      <link>/project/project2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Introduction
+This project analyzes variables within the dataset “Guns” uploaded as a CSV from https://vincentarelbundock.github.io/Rdatasets/datasets.html. The Guns dataset has data from 1977-1999 in all 50 US states and the District of Columbia. The data collected includes “violent” crime rate, “murder” rate, “robbery” rate, and “prisoners” - incarceration rate from the previous year - all per 100,000 members of the population. It also have demographic variables: “afam” is the percent of the state population (ages 10-64) that is African American, “cauc” is the percent of the state population (ages 10-64) that is Caucasian, “male” is the percent of the state population (ages 10-29) that is male, state “population” in millions of people, mean personal “income” in US dollars, and population “density”.</description>
     </item>
     
     <item>

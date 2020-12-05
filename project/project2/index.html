@@ -7,7 +7,7 @@
     <meta name="author" content="Emma Faye Aldred" />
     
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Project 2</title>
+    <title>Project2</title>
     <meta name="generator" content="Hugo 0.79.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -54,13 +54,13 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/project/project2/">Project 2</a></strong>
+            <strong><a href="/project/project2/">Project2</a></strong>
           </h3>
         </div>
  
 <div class="blog-title">
           <h4>
-         December 1, 2020 
+         January 1, 0001 
             &nbsp;&nbsp;
             
           </h4>
@@ -74,9 +74,440 @@
 <script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
 
-<div id="test-project-2" class="section level2">
-<h2>Test Project 2</h2>
-</div>
+<p>Introduction</p>
+<p>This project analyzes variables within the dataset “Guns” uploaded as a CSV from <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" class="uri">https://vincentarelbundock.github.io/Rdatasets/datasets.html</a>. The Guns dataset has data from 1977-1999 in all 50 US states and the District of Columbia. The data collected includes “violent” crime rate, “murder” rate, “robbery” rate, and “prisoners” - incarceration rate from the previous year - all per 100,000 members of the population. It also have demographic variables: “afam” is the percent of the state population (ages 10-64) that is African American, “cauc” is the percent of the state population (ages 10-64) that is Caucasian, “male” is the percent of the state population (ages 10-29) that is male, state “population” in millions of people, mean personal “income” in US dollars, and population “density”. Finally, the dataset includes a variable “law” which is a yes/no variable for whether or not the state has a shall carry law in effect for the year. Each state + DC has a value for each of the variables listed above for all the years between 1977-1999 making a total of 1,172 observations.</p>
+<pre class="r"><code>Guns&lt;- read.csv(&quot;Guns.csv&quot;)
+head(Guns)</code></pre>
+<pre><code>##   X year violent murder robbery prisoners     afam     cauc     male population
+## 1 1 1977   414.4   14.2    96.8        83 8.384873 55.12291 18.17441   3.780403
+## 2 2 1978   419.1   13.3    99.1        94 8.352101 55.14367 17.99408   3.831838
+## 3 3 1979   413.3   13.2   109.5       144 8.329575 55.13586 17.83934   3.866248
+## 4 4 1980   448.5   13.2   132.1       141 8.408386 54.91259 17.73420   3.900368
+## 5 5 1981   470.5   11.9   126.5       149 8.483435 54.92513 17.67372   3.918531
+## 6 6 1982   447.7   10.6   112.0       183 8.514000 54.89621 17.51052   3.925229
+##     income   density   state law
+## 1 9563.148 0.0745524 Alabama  no
+## 2 9932.000 0.0755667 Alabama  no
+## 3 9877.028 0.0762453 Alabama  no
+## 4 9541.428 0.0768288 Alabama  no
+## 5 9548.351 0.0771866 Alabama  no
+## 6 9478.919 0.0773185 Alabama  no</code></pre>
+<p>MANOVA Test</p>
+<pre><code>##           no           yes         
+## statistic 0.7266204    0.5576567   
+## p.value   9.603709e-36 2.887891e-26</code></pre>
+<pre><code>##             Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## law          1 0.23388   35.474     10   1162 &lt; 2.2e-16 ***
+## Residuals 1171                                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre><code>##  Response violent :
+##               Df    Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1   5605560 5605560  52.364 8.319e-13 ***
+## Residuals   1171 125355176  107050                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response murder :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1   2135 2134.76  38.944 6.086e-10 ***
+## Residuals   1171  64190   54.82                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response robbery :
+##               Df   Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1  1538244 1538244  55.363 1.934e-13 ***
+## Residuals   1171 32536070   27785                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response prisoners :
+##               Df   Sum Sq Mean Sq F value Pr(&gt;F)
+## law            1    67344   67344  2.1064  0.147
+## Residuals   1171 37437770   31971               
+## 
+##  Response afam :
+##               Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1   946.6  946.57  41.009 2.189e-10 ***
+## Residuals   1171 27029.0   23.08                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response cauc :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1   5035  5035.2   55.29 2.003e-13 ***
+## Residuals   1171 106642    91.1                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response male :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1  270.2 270.218  97.477 &lt; 2.2e-16 ***
+## Residuals   1171 3246.2   2.772                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response population :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1    500  500.05  18.397 1.941e-05 ***
+## Residuals   1171  31829   27.18                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response income :
+##               Df     Sum Sq Mean Sq F value Pr(&gt;F)
+## law            1         12      12       0 0.9989
+## Residuals   1171 7648104611 6531259               
+## 
+##  Response density :
+##               Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## law            1   27.31 27.3056   15.04 0.0001111 ***
+## Residuals   1171 2126.01  1.8156                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 2 x 9
+##   law   `mean(violent)` `mean(murder)` `mean(robbery)` `mean(afam)` `mean(cauc)`
+##   &lt;fct&gt;           &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+## 1 no               542.           8.43           182.          5.85         61.8
+## 2 yes              381.           5.28            97.9         3.75         66.6
+## # … with 3 more variables: `mean(male)` &lt;dbl&gt;, `mean(population)` &lt;dbl&gt;,
+## #   `mean(density)` &lt;dbl&gt;</code></pre>
+<pre><code>## [1] 0.4311999</code></pre>
+<pre><code>## [1] 0.004545455</code></pre>
+<p>The MANOVA test was done on all numeric variables in the dataset (year is considered a categorical label). The assumptions for MANOVA were not met and, therefore, I am skeptical about the finding from this test. Regardless, the MANOVA test was conducted to determine the effect of the variable law on various crime statistics (violent, murder, robbery, prisoner) and demographics (afam, cauc, male, population, and density).
+Significant differences were found among law for at least one of the dependent variables (Pillai trace= 0.23, psuedo F(10,1162)=35.474, p&lt;.0001). 10 univariate ANOVAs were performed as a follow up and were significant for violent (F(1,1171)=52.364,p&lt;.0001), murder (F(1,1171)=38.944,p&lt;.0001), robbery (F(1,1171)=55.363,p&lt;.0001), afam (F(1,1171)=41.009,p&lt;.0001), cauc (F(1,1171)=55.29,p&lt;.0001), male (F(1,1171)=97.477,p&lt;.0001), population (F(1,1171)=18.397,p&lt;.0001), and density (F(1,1171)=15.04,p&lt;.0001). A post hoc analysis did not need to be perfomed since there are only two categories for the law variable (yes/no). Law - yes or no - was found to differ significantly from in terms of violent, murder, robbery, afam, cauc, male, population, and density. Since a total of 11 tests were conducted (1 manova and 10 anova), the Bonferroni method was used to control for Type 1 error rates for multiple comparisons. Without this correction, the probability of at least one 1 type error would be .43; Therefore, a p-value of 0.0045 was used, but this correction did not change the significance of any off the variables.</p>
+<p>Randomization Test</p>
+<pre class="r"><code>#Ho: mean violent crime rate is the same for states with and without shall carry laws
+#Ha: mean violent crime rate is different for states with and without shall carry laws
+Guns%&gt;%group_by(law)%&gt;%summarize(Avg=mean(violent))%&gt;%summarize(diff(Avg))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `diff(Avg)`
+##         &lt;dbl&gt;
+## 1       -161.</code></pre>
+<pre class="r"><code>rand_crime&lt;-vector()
+for(i in 1:5000){
+new&lt;-data.frame(vcrime=sample(Guns$violent),carry_law=Guns$law)
+rand_crime[i]&lt;- mean(new[new$carry_law==&quot;yes&quot;,]$vcrime)-mean(new[new$carry_law==&quot;no&quot;,]$vcrime)
+}
+mean(rand_crime&lt; -161.1868|rand_crime&gt; 161.1868) #reject Ho</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>{hist(rand_crime,main=&quot;Null Distribution of Random Crime Rate&quot;,ylab=&quot;Frequency&quot;,xlim = c(-162,162)); abline(v = c(-161.1868, 161.1868),col=&quot;red&quot;)}</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The randomization test was performed to determine if the following hypotheses were true:
+Ho: mean violent crime rate is the same for states with and without shall carry laws.
+Ha: mean violent crime rate is different for states with and without shall carry laws.
+A p value of 0.00 was computed which is less that .001 and, therefore, the null hypothesis can be rejected. There is evidence that the mean violent crime rate is different for states with and without shall carry laws</p>
+<p>Linear Regression Model</p>
+<pre class="r"><code>Guns$y&lt;-ifelse(Guns$law==&quot;yes&quot;,1,0)
+Guns$prisoners_c&lt;-Guns$prisoners-mean(Guns$prisoners)
+Guns$violent_c&lt;-Guns$violent-mean(Guns$violent)
+fit&lt;-lm(violent_c~y*prisoners_c, data=Guns)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = violent_c ~ y * prisoners_c, data = Guns)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1223.30  -145.25   -35.48   107.78  1454.38 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     45.02476    7.52585   5.983 2.91e-09 ***
+## y             -182.85392   15.30769 -11.945  &lt; 2e-16 ***
+## prisoners_c      1.36556    0.04056  33.670  &lt; 2e-16 ***
+## y:prisoners_c   -0.18382    0.09463  -1.942   0.0523 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 224.2 on 1169 degrees of freedom
+## Multiple R-squared:  0.5513, Adjusted R-squared:  0.5501 
+## F-statistic: 478.7 on 3 and 1169 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ggplot(Guns, aes(prisoners_c,violent_c, color = law)) + geom_smooth(method = &quot;lm&quot;, se = F, fullrange = T)+geom_point()+ggtitle(&quot;State Violent Crime Rate by Prisoner Incarceration Rate and &#39;Shall Carry Law&#39;&quot;)+xlab(&quot;Mean Incarceration Rate&quot;)+ylab(&quot;Mean Violent Crime Rate&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>#Assumption Checking LINE
+ggplot(Guns,aes(violent_c,prisoners_c))+geom_point() #linear relationship assumption</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>resids&lt;-fit$residuals
+fitted&lt;-fit$fitted.values
+shapiro.test(resids) #not normal</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  resids
+## W = 0.92662, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ggplot()+geom_histogram(aes(resids), bins=50)</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code>bptest(fit) #variance not constant</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 169.55, df = 3, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ggplot()+geom_point(aes(fitted,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<pre class="r"><code>coeftest(fit,vcov=vcovHC(fit))[,1:2]</code></pre>
+<pre><code>##                   Estimate Std. Error
+## (Intercept)     45.0247554  8.0929317
+## y             -182.8539165 13.6003343
+## prisoners_c      1.3655550  0.1107190
+## y:prisoners_c   -0.1838174  0.1387172</code></pre>
+<p>The lm model was constructed to investigate the effects of prisoners incarceration rate and the shall carry law on violent crime rates across the US States + DC. For states with average prisoner incarceration rates, the predicted violent crime rates were 182.85392 lower if the state had a ‘shall carry’ law. For states without the ‘shall carry’ law, the predicted violent crime rates is 1.36556 higher for every unit increase in prisoner incarceration rate. The slope of mean prisoner incarcerataion rate on violent crime is 0.18382 less for states without the ‘shall carry law’.
+The linear fit model showed a fairly linear relationship between mean violent crime and mean prisoner incarceration rate. The Shapiro-Wilk test in which Ho = there is normally distributed residuals yeilded a p-value of &lt; 2.2e-16 and thus the normality assumption failed. Furthermore, a Breusch-Pagan test was performeed in which Ho = there is equal variance of points/residuals along regression line yeilded a p value &lt; 2.2e-16 and thus the homoskedasticity assumption also failed to be met. In the histogram of the residuals and in the scatterplot of the fitted values and residuals, the majority of the data is clustered together with a smaller - yet noticeable - portion of the data much further out. I predict that the smaller portion of the dataset that deviates from the majority is the likely reason the assumptions failed to be met.
+The robust standard errors of the linear model was computed and the output resulted in the same coefficients but a higher standard error (and thus a higher p value) for the intercept, prisoners_c and the interaction between y and prisoners_c and a lower standard error (and thus lower p value) for y. This model is more resistant to the lack of homoskedasticity than the original model. 55.13% of the variation in mean violent crime is being explained by the linear relationship with mean prisoner incarceration rate and the presence or lack thereof a ‘shall carry’ law.</p>
+<p>Bootstrapped Standard Errors - Resampling the Residuals</p>
+<pre class="r"><code>resid_crimesamp&lt;-replicate(5000,{
+new_resids&lt;-sample(resids,replace=TRUE) 
+Guns$new_violent&lt;-fitted+new_resids 
+fit&lt;-lm(new_violent~y*prisoners_c,data=Guns)
+coef(fit)
+})
+resid_crimesamp%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept)        y prisoners_c y:prisoners_c
+## 1    7.425284 15.07784  0.04039356    0.09444301</code></pre>
+<p>Bootstrapping the residuals on the same regression model resulted in all standard errors that were less (and thus p values that were less) than the original model and very similar to the robust standard error output. The bootstrapping standard erros were slighlty lower compared to the robust SE output for the intercept (7.455181), prisoners_c (0.04031502), and the interaction between prisoners_c and y (0.09646994) but higher for the dummy variable y for ‘shall carry’ law (15.17598).</p>
+<p>Binary Logistic Regression Model - Prisoners and Violent Crime</p>
+<pre class="r"><code>fit2&lt;-glm(y~prisoners_c+violent_c, data=Guns,family=&quot;binomial&quot;)
+summary(fit2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ prisoners_c + violent_c, family = &quot;binomial&quot;, 
+##     data = Guns)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.70750  -0.78056  -0.53328  -0.09552   3.03652  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -1.4219855  0.0866157 -16.417   &lt;2e-16 ***
+## prisoners_c  0.0063178  0.0006931   9.115   &lt;2e-16 ***
+## violent_c   -0.0049733  0.0004672 -10.644   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1300.8  on 1172  degrees of freedom
+## Residual deviance: 1134.9  on 1170  degrees of freedom
+## AIC: 1140.9
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>Guns$prob&lt;-predict(fit2,type=&quot;response&quot;)
+Guns$pred&lt;-ifelse(Guns$prob&gt;.5,1,0)
+table(truth=Guns$y, prediction=Guns$pred&gt;.5)%&gt;%addmargins</code></pre>
+<pre><code>##      prediction
+## truth FALSE TRUE  Sum
+##   0     864   24  888
+##   1     228   57  285
+##   Sum  1092   81 1173</code></pre>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+  tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+  f1=2*(sens*ppv)/(sens+ppv)
+
+  if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE){
+    truth&lt;-as.numeric(truth)-1}
+  
+  #CALCULATE EXACT AUC
+  ord&lt;-order(probs, decreasing=TRUE)
+  probs &lt;- probs[ord]; truth &lt;- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+  TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+  
+  n &lt;- length(TPR)
+  auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,f1,auc)
+}
+class_diag(Guns$pred,Guns$y)</code></pre>
+<pre><code>##         acc sens     spec       ppv        f1       auc
+## 1 0.7851662  0.2 0.972973 0.7037037 0.3114754 0.5864865</code></pre>
+<pre class="r"><code>Guns$logit&lt;-predict(fit2,type=&quot;link&quot;,family=&quot;binomial&quot;) 
+
+Guns%&gt;%ggplot()+geom_density(aes(logit,color=law,fill=law),alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab(&quot;predictor(logit)&quot;)</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ROCplot&lt;-ggplot(Guns)+geom_roc(aes(d=y,m=prob), n.cuts=0) 
+ROCplot</code></pre>
+<p><img src="/project/project2_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.7533804</code></pre>
+<p>A logistic regression model was created to predict the presence or lack thereof a ‘shall carry’ law in states by prisoner incarceration rate and violent crime rates. For states with the mean prisoner incarceration rate, every unit increase in mean violent crime rates decreases the probability of having a shall carry law by 0.0049733. For states with mean violent crime rates, every unit increase in mean incarceration rates increases the probability of having a ‘shall carry’ law by 0.0063178. The model is doing bad with an AUC of 0.5864865. It has an accuracy of 0.7851662, sensitivity of 0.2, specificity of 0.972973, and precision of 0.7037037.
+The ROC plot of the model corresponds to an AUC value of 0.7533804 which is fair. There is about a .75 probability that a ranodmy selected state (including DC) with a shall carry law has a higher predicted probability of having the law than a randomly selected state without the shall carry law.</p>
+<p>Logistic Regression Model - Complete</p>
+<pre class="r"><code>Guns1&lt;-read_csv(&quot;Guns.csv&quot;)%&gt;%select(-1,-2,-state)</code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   X1 = col_double(),
+##   year = col_double(),
+##   violent = col_double(),
+##   murder = col_double(),
+##   robbery = col_double(),
+##   prisoners = col_double(),
+##   afam = col_double(),
+##   cauc = col_double(),
+##   male = col_double(),
+##   population = col_double(),
+##   income = col_double(),
+##   density = col_double(),
+##   state = col_character(),
+##   law = col_character()
+## )</code></pre>
+<pre class="r"><code>Guns1$y&lt;-ifelse(Guns1$law==&quot;yes&quot;,1,0)
+Guns1&lt;-Guns1%&gt;%select(-law)
+fit3&lt;-glm(y~., data=Guns1,family = &quot;binomial&quot;)</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(fit3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ ., family = &quot;binomial&quot;, data = Guns1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8360  -0.6379  -0.3495   0.0000   2.7921  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -1.086e+01  3.864e+00  -2.811 0.004943 ** 
+## violent     -2.464e-03  8.465e-04  -2.911 0.003601 ** 
+## murder      -1.563e-01  5.137e-02  -3.043 0.002346 ** 
+## robbery      2.529e-03  2.425e-03   1.043 0.296955    
+## prisoners    4.795e-03  1.040e-03   4.611 4.02e-06 ***
+## afam         5.927e-01  1.228e-01   4.825 1.40e-06 ***
+## cauc         3.265e-01  5.892e-02   5.542 3.00e-08 ***
+## male        -5.740e-01  7.885e-02  -7.279 3.35e-13 ***
+## population   1.564e-02  2.365e-02   0.661 0.508348    
+## income      -2.929e-04  7.287e-05  -4.020 5.82e-05 ***
+## density     -2.989e+00  7.835e-01  -3.815 0.000136 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1300.80  on 1172  degrees of freedom
+## Residual deviance:  950.37  on 1162  degrees of freedom
+## AIC: 972.37
+## 
+## Number of Fisher Scoring iterations: 8</code></pre>
+<pre class="r"><code>prob2&lt;-predict(fit3,type=&quot;response&quot;)
+pred2&lt;-ifelse(prob2&gt;.5,1,0)
+table(truth=Guns$y, prediction=pred2)%&gt;%addmargins</code></pre>
+<pre><code>##      prediction
+## truth    0    1  Sum
+##   0    822   66  888
+##   1    165  120  285
+##   Sum  987  186 1173</code></pre>
+<pre class="r"><code>class_diag(pred2,Guns$y)</code></pre>
+<pre><code>##         acc      sens      spec       ppv        f1       auc
+## 1 0.8030691 0.4210526 0.9256757 0.6451613 0.5095541 0.6733642</code></pre>
+<pre class="r"><code>set.seed(6)
+k=10
+data&lt;-Guns1[sample(nrow(Guns1)),]
+folds&lt;-cut(seq(1:nrow(Guns1)),breaks=k,labels=F)
+diags&lt;-NULL
+for(i in 1:k){
+train&lt;-data[folds!=i,]
+test&lt;-data[folds==i,]
+truth&lt;-test$y 
+fit4&lt;-glm(y~.,data=train,family=&quot;binomial&quot;)
+probs&lt;-predict(fit4,newdata = test,type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summarize_all(diags,mean) </code></pre>
+<pre><code>##         acc      sens      spec       ppv        f1       auc
+## 1 0.7987976 0.4141377 0.9213843 0.6279699 0.4975094 0.8291958</code></pre>
+<pre class="r"><code>y&lt;-as.matrix(Guns1$y)
+x&lt;-model.matrix(y~.,data=Guns1)
+cv &lt;- cv.glmnet(x,y, family=&quot;binomial&quot;) 
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+
+coef(lasso) #Output on RMD shows no coef for afam or murder but HTML output shows coef for all variables</code></pre>
+<pre><code>## 12 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                        s0
+## (Intercept)  0.5254776511
+## (Intercept)  .           
+## violent     -0.0023303822
+## murder      -0.0484433985
+## robbery     -0.0004525957
+## prisoners    0.0047490348
+## afam         0.1315789530
+## cauc         0.1201247528
+## male        -0.4809442388
+## population  -0.0016839057
+## income      -0.0001351454
+## density     -1.5926421785</code></pre>
+<pre class="r"><code>set.seed(6)
+Guns2&lt;-Guns1%&gt;%select(-afam,-murder)
+k=10
+data_las&lt;-Guns2[sample(nrow(Guns2)),]
+folds_las&lt;-cut(seq(1:nrow(Guns2)),breaks=k,labels=F)
+diags_las&lt;-NULL
+for(i in 1:k){
+train_las&lt;-data_las[folds_las!=i,]
+test_las&lt;-data_las[folds_las==i,]
+truth_las&lt;-test_las$y 
+fit5&lt;-glm(y~.,data=train_las,family=&quot;binomial&quot;)
+probs_las&lt;-predict(fit5,newdata = test_las,type=&quot;response&quot;)
+diags_las&lt;-rbind(diags_las,class_diag(probs_las,truth_las))
+}</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summarize_all(diags_las,mean) </code></pre>
+<pre><code>##         acc      sens      spec       ppv        f1       auc
+## 1 0.8022309 0.4343141 0.9194945 0.6374604 0.5129433 0.8179803</code></pre>
+<p>A logistic regression model was created to predict the presence, or lack thereof, a ‘shall carry’ law in the US states + DC with all the variables in the dataset Guns (excluding year, state, and X1 which were classifying variables). The accuracy of the model was 0.8030691, sensitivity was 0.4210526, specificity was 0.9256757, precision was 0.6451613 to give an overall AUC of 0.6733642 which is poor. There is about a .67 probaility that a randomly selected state + DC with a shall carry law has a higher predicted probaility of having the law than a randomly selected state without the ‘shall carry’ law.
+A 10-fold cross validation on the model resulted in an overall better model with an AUC of 0.8291958 (pretty good!). The accuracay of the model was 0.7987976, sensitivity was 0.4141377, specificity was 0.9213843, and precision was 0.6279699. Overall, there is about a .83 probability that a randomly selected state + DC with a ‘shall carry’ law has a higher predicted probaility of having the law than a randomly selected state without the ‘shall carry’ law. The cross validation model has a slighly lower accuracy, similar specificity, similar specificity, slighly lower precision, and an overall AUC that was ~20% higher than the in-sample metrics.
+A lasso analysis on the same model retained the following variables: violent, robbery, prisoners, cauc, male, population, income, and density. Therefore, only afam and murder were eliminated. Without the afam variable being included, the 10-fold CV yeilded a AUC of 0.8179803 (good!), accuracy of 0.8022309, sensitivity of 0.4343141, specificity of 0.9194945 and precision of 0.6374604. Compared to the first 10-fold CV that included the afam and murder variable, the auc is slighly lower, but is almost the same (0.818 vs 0.829).</p>
 
             
         <hr>         <div class="related-posts">
