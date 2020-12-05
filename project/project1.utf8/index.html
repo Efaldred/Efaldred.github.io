@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Emma Faye Aldred" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1: State Crime</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/post/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project/project1.utf8/">Project 1: State Crime</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <pre><code>#Introduction
+  *This project analyzes portions of three datasets that provide information on all of the 50 US states, excluding the District of Columbia. Each datset provides either information on crime, car crashes, or population statistics in each state. I chose these datasets because I wanted to see if there was a connection between state statistics (income, illiteracy, etc), reckless driving, and/or crime. I expected that with more poverty, less education, and higher urban populations I would find more crime and reckless driving. All datsets were loaded within the R dataset package.*
+  
+  *The bad_drivers dataset, found within the library fivethirtyeight, was an interesting datset in which the variables drivers_crash was found. These variables provided information about the number of drivers involved in fatal collisions per billion miles for each state and these percent of the crashed that involved speeding and alochol.*
+  
+  *The USArrests dataset, found within the library datasets, provided the variables Murder_1973, Assault, UrbanPop, and Rape which contained data on the number of murders, assaults, and rapes per 100,000 in 1973 for each state as well as the percent urban population.*
+  
+  *The state.x77 dataset, found within the library datasets, contained state facts and figures collected over various years in the 70s. The variables from this dataset used in the analysis were Murder_1976, population, income, illiteracy, life_exp, HS_Grad (percent high-school graduates), and frost (mean number of days with temperaature below freezing).*
+
+#Package loading
+
+```r
+library(tidyverse)
+library(dplyr)
+library(cluster)
+library(GGally)
+library(factoextra)
+library(fivethirtyeight) #for dataset bad_drivers
+library(datasets) #for dataset USArrests and state.x77
+?bad_drivers
+?USArrests
+?state.x77
+</code></pre><p>#Tidy Data and Join for Combined Datset</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">bad_drivers_dirty<span style="color:#f92672">&lt;-</span>bad_drivers <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">pivot_longer</span>(<span style="color:#a6e22e">contains</span>(<span style="color:#e6db74">&#34;perc_&#34;</span>), values_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Value&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">separate</span>(name,into<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Percent&#34;</span>,<span style="color:#e6db74">&#34;Offense&#34;</span>),sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;\\_&#34;</span>)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">glimpse</span>()
+</code></pre></div><pre><code>## Rows: 204
+## Columns: 7
+## $ state              &lt;chr&gt; &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alask…
+## $ num_drivers        &lt;dbl&gt; 18.8, 18.8, 18.8, 18.8, 18.1, 18.1, 18.1, 18.1, 18…
+## $ insurance_premiums &lt;dbl&gt; 784.55, 784.55, 784.55, 784.55, 1053.48, 1053.48, …
+## $ losses             &lt;dbl&gt; 145.08, 145.08, 145.08, 145.08, 133.93, 133.93, 13…
+## $ Percent            &lt;chr&gt; &quot;perc&quot;, &quot;perc&quot;, &quot;perc&quot;, &quot;perc&quot;, &quot;perc&quot;, &quot;perc&quot;, &quot;p…
+## $ Offense            &lt;chr&gt; &quot;speeding&quot;, &quot;alcohol&quot;, &quot;not&quot;, &quot;no&quot;, &quot;speeding&quot;, &quot;a…
+## $ Value              &lt;int&gt; 39, 30, 96, 80, 41, 25, 90, 94, 35, 28, 84, 96, 18…
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#pivot_longer was used to untidy the bad_drivers dataset so that all offenses were in one column</span>
+
+bad_drivers_clean<span style="color:#f92672">&lt;-</span>bad_drivers_dirty <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">unite</span>(Percent,Offense,col<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Crime&#34;</span>,sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;_&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pivot_wider</span>(names_from<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Crime&#34;</span>,values_from<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Value&#34;</span>) <span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">glimpse</span>()
+</code></pre></div><pre><code>## Rows: 51
+## Columns: 8
+## $ state              &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;Calif…
+## $ num_drivers        &lt;dbl&gt; 18.8, 18.1, 18.6, 22.4, 12.0, 13.6, 10.8, 16.2, 5.…
+## $ insurance_premiums &lt;dbl&gt; 784.55, 1053.48, 899.47, 827.34, 878.41, 835.50, 1…
+## $ losses             &lt;dbl&gt; 145.08, 133.93, 110.35, 142.39, 165.63, 139.91, 16…
+## $ perc_speeding      &lt;int&gt; 39, 41, 35, 18, 35, 37, 46, 38, 34, 21, 19, 54, 36…
+## $ perc_alcohol       &lt;int&gt; 30, 25, 28, 26, 28, 28, 36, 30, 27, 29, 25, 41, 29…
+## $ perc_not           &lt;int&gt; 96, 90, 84, 94, 91, 79, 87, 87, 100, 92, 95, 82, 8…
+## $ perc_no            &lt;int&gt; 80, 94, 96, 95, 89, 95, 82, 99, 100, 94, 93, 87, 9…
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#pivot_wider was used to retidy the dataset so that each state had only one observation and each crime had its own column</span>
+
+USArrests<span style="color:#f92672">&lt;-</span>USArrests <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;state&#34;</span>) 
+<span style="color:#75715e">#rownames_to_column was used to make a column named &#39;state&#39; from the rownames</span>
+
+USArrests_dirty<span style="color:#f92672">&lt;-</span>USArrests<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">pivot_longer</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>,names_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;crime&#34;</span>, values_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;per100k&#34;</span>)<span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">glimpse</span>()
+</code></pre></div><pre><code>## Rows: 200
+## Columns: 3
+## $ state   &lt;chr&gt; &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Alaska…
+## $ crime   &lt;chr&gt; &quot;Murder&quot;, &quot;Assault&quot;, &quot;UrbanPop&quot;, &quot;Rape&quot;, &quot;Murder&quot;, &quot;Assault&quot;,…
+## $ per100k &lt;dbl&gt; 13.2, 236.0, 58.0, 21.2, 10.0, 263.0, 48.0, 44.5, 8.1, 294.0,…
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#pivot longer was used to untidy the USArrests dataset so that all the crimes were in one column</span>
+
+USArrests_clean<span style="color:#f92672">&lt;-</span>USArrests_dirty<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">pivot_wider</span>(names_from<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;crime&#34;</span>,values_from<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;per100k&#34;</span>)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rename</span>(Murder_1975<span style="color:#f92672">=</span>Murder)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">glimpse</span>()
+</code></pre></div><pre><code>## Rows: 50
+## Columns: 5
+## $ state       &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;California&quot;,…
+## $ Murder_1975 &lt;dbl&gt; 13.2, 10.0, 8.1, 8.8, 9.0, 7.9, 3.3, 5.9, 15.4, 17.4, 5.3…
+## $ Assault     &lt;dbl&gt; 236, 263, 294, 190, 276, 204, 110, 238, 335, 211, 46, 120…
+## $ UrbanPop    &lt;dbl&gt; 58, 48, 80, 50, 91, 78, 77, 72, 80, 60, 83, 54, 83, 65, 5…
+## $ Rape        &lt;dbl&gt; 21.2, 44.5, 31.0, 19.5, 40.6, 38.7, 11.1, 15.8, 31.9, 25.…
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#pivot wider was use to retidy the USArrests dataet so each crime had its own column and each state had only one observation. The murder column was renamed so it could be differentiated by year</span>
+
+state.x77<span style="color:#f92672">&lt;-</span>state.x77<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">as.data.frame</span>() <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">rename</span>(Murder_1976<span style="color:#f92672">=</span>Murder)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;state&#34;</span>)
+<span style="color:#75715e">#state.x77 was changed from a matrix to a dataframe and it&#39;s murder value was differentiated by year</span>
+
+state_crime<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">left_join</span>(USArrests_clean,bad_drivers_clean)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">left_join</span>(.,state.x77)
+<span style="color:#75715e">#Two left joins were used to combine all three datasets by state</span>
+
+state_crime<span style="color:#f92672">&lt;-</span>state_crime[,<span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">17</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">7</span>,<span style="color:#ae81ff">8</span>,<span style="color:#ae81ff">9</span>,<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">12</span>,<span style="color:#ae81ff">13</span>,<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">15</span>,<span style="color:#ae81ff">16</span>,<span style="color:#ae81ff">18</span>,<span style="color:#ae81ff">19</span>,<span style="color:#ae81ff">20</span>)]
+<span style="color:#75715e">#the columns were rearranged to be in a more logical order</span>
+
+state_crime<span style="color:#f92672">&lt;-</span>state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>insurance_premiums,<span style="color:#f92672">-</span>losses,<span style="color:#f92672">-</span>perc_speeding,<span style="color:#f92672">-</span>perc_alcohol,<span style="color:#f92672">-</span>perc_not,<span style="color:#f92672">-</span>perc_no,<span style="color:#f92672">-</span>Area)
+<span style="color:#75715e">#Variables that would not be used in the analysis were dropped to make the data easier to view</span>
+</code></pre></div><p><em>The datasets were joined by the common ID variable &ldquo;state&rdquo;. A left join was used since USArrests and state.x77 included the 50 states only and bad_drivers included the 50 states + the District of Columbia. Therefore, the left join dropped DC so that every state would have a value for each variable in the combined dataset.</em></p>
+<p>#Wrangling - Summary Statistics</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Part1:Exploring the dataset</span>
+
+state_crime<span style="color:#f92672">&lt;-</span>state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(Murder_Change<span style="color:#f92672">=</span>Murder_1975<span style="color:#f92672">-</span>Murder_1976)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rename</span>(driver_crash<span style="color:#f92672">=</span>num_drivers)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rename</span>(HS_Grad<span style="color:#f92672">=</span>`HS Grad`,Life_Exp<span style="color:#f92672">=</span>`Life Exp`)
+<span style="color:#75715e">#create new variable for change in murder between the years 1975 and 1976 and rename variables to exclude spaces</span>
+
+state_crime<span style="color:#f92672">&lt;-</span>state_crime[,<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;state&#34;</span>,<span style="color:#e6db74">&#34;Murder_1975&#34;</span>,<span style="color:#e6db74">&#34;Murder_1976&#34;</span>,<span style="color:#e6db74">&#34;Murder_Change&#34;</span>,<span style="color:#e6db74">&#34;Assault&#34;</span>,<span style="color:#e6db74">&#34;Rape&#34;</span>,<span style="color:#e6db74">&#34;driver_crash&#34;</span>, <span style="color:#e6db74">&#34;Population&#34;</span>,<span style="color:#e6db74">&#34;UrbanPop&#34;</span>,<span style="color:#e6db74">&#34;Life_Exp&#34;</span>,<span style="color:#e6db74">&#34;Income&#34;</span>,<span style="color:#e6db74">&#34;Illiteracy&#34;</span>,<span style="color:#e6db74">&#34;HS_Grad&#34;</span>,<span style="color:#e6db74">&#34;Frost&#34;</span>)]
+<span style="color:#75715e">#reorganize variable order</span>
+
+state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">quantile</span>(HS_Grad))
+</code></pre></div><pre><code>## # A tibble: 5 x 1
+##   `quantile(HS_Grad)`
+##                 &lt;dbl&gt;
+## 1                37.8
+## 2                48.0
+## 3                53.2
+## 4                59.2
+## 5                67.3
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_crime<span style="color:#f92672">&lt;-</span>state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(HS_Grad_level<span style="color:#f92672">=</span><span style="color:#a6e22e">case_when</span>(HS_Grad<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">59.15</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;High_percent_grad&#34;</span>,
+                                             HS_Grad<span style="color:#f92672">&gt;=</span><span style="color:#ae81ff">48.05</span> <span style="color:#f92672">&amp;</span> HS_Grad<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">59.15</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Med_percent_grad&#34;</span>,
+                                             HS_Grad<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">48.05</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Low_percent_grad&#34;</span>)) 
+<span style="color:#75715e">#new categorical variable for HS_Grad_level made based on quantile distinction for HS_grad</span>
+
+state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">filter</span>(Population<span style="color:#f92672">&gt;</span><span style="color:#a6e22e">mean</span>(Population))<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select</span>(state,Murder_Change,Illiteracy)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">arrange</span>(Illiteracy)
+</code></pre></div><pre><code>## # A tibble: 16 x 3
+##    state          Murder_Change Illiteracy
+##    &lt;chr&gt;                  &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Indiana                0.1          0.7
+##  2 Wisconsin             -0.400        0.7
+##  3 Missouri              -0.3          0.8
+##  4 Ohio                  -0.1          0.8
+##  5 Illinois               0.100        0.9
+##  6 Michigan               1            0.9
+##  7 Pennsylvania           0.2          1  
+##  8 California            -1.3          1.1
+##  9 Massachusetts          1.1          1.1
+## 10 New Jersey             2.2          1.1
+## 11 Florida                4.7          1.3
+## 12 New York               0.200        1.4
+## 13 Virginia              -1            1.4
+## 14 North Carolina         1.9          1.8
+## 15 Georgia                3.50         2  
+## 16 Texas                  0.5          2.2
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#exploratory analysis on murder_change and illiteracy levels for the states that have a population greater than the mean populataion; no obvious connection was found</span>
+
+state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(HS_Grad_level)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">median</span>(Rape),<span style="color:#a6e22e">median</span>(Assault),<span style="color:#a6e22e">cor</span>(Rape,Assault),<span style="color:#a6e22e">mean</span>(UrbanPop))
+</code></pre></div><pre><code>## # A tibble: 3 x 5
+##   HS_Grad_level `median(Rape)` `median(Assault… `cor(Rape, Assa…
+##   &lt;chr&gt;                  &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 High_percent…           22.9             145             0.876
+## 2 Low_percent_…           20.7             201             0.324
+## 3 Med_percent_…           17.6             134.            0.883
+## # … with 1 more variable: `mean(UrbanPop)` &lt;dbl&gt;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#exploratory analysis on rape, assault, the correlation between them, and urban population when grouped by HS_Grad_level; grouping by high school grad level showed differences in some of these values and showed that high and medium grad levels are more similar overall than the low grad level</span>
+
+<span style="color:#75715e">#Part2:Summary Statistics for Numeric Variables</span>
+
+state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">mean</span>(Assault),<span style="color:#a6e22e">mean</span>(Rape),<span style="color:#a6e22e">max</span>(Murder_Change),<span style="color:#a6e22e">min</span>(Murder_Change),<span style="color:#a6e22e">median</span>(Murder_1975),<span style="color:#a6e22e">median</span>(Murder_1976),<span style="color:#a6e22e">median</span>(Population),<span style="color:#a6e22e">sd</span>(Population),<span style="color:#a6e22e">median</span>(driver_crash),<span style="color:#a6e22e">cor</span>(Illiteracy,HS_Grad))
+</code></pre></div><pre><code>## # A tibble: 1 x 10
+##   `mean(Assault)` `mean(Rape)` `max(Murder_Cha… `min(Murder_Cha…
+##             &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1            171.         21.2              4.7             -3.3
+## # … with 6 more variables: `median(Murder_1975)` &lt;dbl&gt;,
+## #   `median(Murder_1976)` &lt;dbl&gt;, `median(Population)` &lt;dbl&gt;,
+## #   `sd(Population)` &lt;dbl&gt;, `median(driver_crash)` &lt;dbl&gt;, `cor(Illiteracy,
+## #   HS_Grad)` &lt;dbl&gt;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(HS_Grad_level)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">mean</span>(Assault),<span style="color:#a6e22e">mean</span>(Rape),<span style="color:#a6e22e">mean</span>(Murder_Change),<span style="color:#a6e22e">max</span>(Murder_Change),<span style="color:#a6e22e">min</span>(Murder_Change),<span style="color:#a6e22e">median</span>(Murder_1975),<span style="color:#a6e22e">median</span>(Murder_1976),<span style="color:#a6e22e">median</span>(Population),<span style="color:#a6e22e">sd</span>(Population),<span style="color:#a6e22e">median</span>(driver_crash),<span style="color:#a6e22e">cor</span>(Illiteracy,HS_Grad),<span style="color:#a6e22e">cor</span>(UrbanPop,driver_crash),<span style="color:#a6e22e">cor</span>(Income,Life_Exp))
+</code></pre></div><pre><code>## # A tibble: 3 x 14
+##   HS_Grad_level `mean(Assault)` `mean(Rape)` `mean(Murder_Ch… `max(Murder_Cha…
+##   &lt;chr&gt;                   &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 High_percent…            159.         26.9           -0.115              1.5
+## 2 Low_percent_…            205.         19.3            0.892              3.6
+## 3 Med_percent_…            158.         19.2            0.433              4.7
+## # … with 9 more variables: `min(Murder_Change)` &lt;dbl&gt;,
+## #   `median(Murder_1975)` &lt;dbl&gt;, `median(Murder_1976)` &lt;dbl&gt;,
+## #   `median(Population)` &lt;dbl&gt;, `sd(Population)` &lt;dbl&gt;,
+## #   `median(driver_crash)` &lt;dbl&gt;, `cor(Illiteracy, HS_Grad)` &lt;dbl&gt;,
+## #   `cor(UrbanPop, driver_crash)` &lt;dbl&gt;, `cor(Income, Life_Exp)` &lt;dbl&gt;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">cormat<span style="color:#f92672">&lt;-</span>state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select_if</span>(is.numeric)<span style="color:#f92672">%&gt;%</span>cor
+</code></pre></div><p><em>State_crime was explored by using various summary statistics. Mutate was use to make a variable corresponding to the change in murder per 100,000 between the years 1975 and 1976. Along with case_when, another categorical variable was made to categorize high school graduation rates depending on if they were below the 25th percentile (low), in between the 25th and 75th percentile (medium), or above the 75th percentile (high).</em></p>
+<p><em>Similar summary statistics were calculated overall in the dataset and after grouping by HS_Grad_level. Interestingly, values found in overall summary did not reflect the values found when grouping by high school graduation. The low graduation group had a higher mean assault score but the high graduation group had a higher mean rape score. Only the high grad group had a negative murder change between 1975 and 1976 and murder in both years was much higher for the low grad group. The med and high grad groups had a positive correlation between illiteracy and HS_grad, but this correlation was negative when calculaated without grouping. Finally,the high grad group was the only group with a negative correlation between income and life expectancy. These differences provide evidence graduation level is correlated with various crime statistics.</em></p>
+<p>#Visualizations</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">tidycor <span style="color:#f92672">&lt;-</span> cormat <span style="color:#f92672">%&gt;%</span> as.data.frame <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;Variable_1&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+<span style="color:#a6e22e">pivot_longer</span>(<span style="color:#ae81ff">-1</span>,names_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Variable_2&#34;</span>,values_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;correlation&#34;</span>)
+
+tidycor<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(Variable_1,Variable_2,fill<span style="color:#f92672">=</span>correlation))<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_tile</span>()<span style="color:#f92672">+</span> <span style="color:#a6e22e">scale_fill_gradient2</span>(low<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>,mid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;white&#34;</span>,high<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;blue&#34;</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">theme</span>(axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(angle <span style="color:#f92672">=</span> <span style="color:#ae81ff">90</span>, hjust<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">+</span> <span style="color:#a6e22e">coord_fixed</span>()<span style="color:#f92672">+</span><span style="color:#a6e22e">ggtitle</span>(<span style="color:#e6db74">&#34;Correlation Matrix for US State Data&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(avg_murder<span style="color:#f92672">=</span>((Murder_1976<span style="color:#f92672">+</span>Murder_1975)<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>))<span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(x<span style="color:#f92672">=</span>Illiteracy,y<span style="color:#f92672">=</span>avg_murder,color<span style="color:#f92672">=</span>Income,shape<span style="color:#f92672">=</span>HS_Grad_level))<span style="color:#f92672">+</span><span style="color:#a6e22e">scale_color_gradient</span>(low<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>,high<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;blue&#34;</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_point</span>(<span style="color:#a6e22e">aes</span>(size<span style="color:#f92672">=</span>Population))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">ggtitle</span>(<span style="color:#e6db74">&#34;Average Murder Per 100,000 1975-1976 by Illiteracy&#34;</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">theme</span>(legend.background<span style="color:#f92672">=</span><span style="color:#a6e22e">element_rect</span>(fill<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lightgray&#34;</span>))<span style="color:#f92672">+</span><span style="color:#a6e22e">xlab</span>(<span style="color:#e6db74">&#34;Percent Illiterate&#34;</span>)<span style="color:#f92672">+</span> <span style="color:#a6e22e">ylab</span>(<span style="color:#e6db74">&#34;Average Murder per 100,000&#34;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(n.breaks<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">scale_y_continuous</span>(n.breaks<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">quantile</span>(Rape))
+</code></pre></div><pre><code>## # A tibble: 5 x 1
+##   `quantile(Rape)`
+##              &lt;dbl&gt;
+## 1              7.3
+## 2             15.1
+## 3             20.1
+## 4             26.2
+## 5             46
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_crime<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(Rape_frequency<span style="color:#f92672">=</span><span style="color:#a6e22e">case_when</span>(Rape<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">20.100</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Above Average&#34;</span>,
+                                              Rape<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">20.100</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;At or Below Average&#34;</span>))<span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(x<span style="color:#f92672">=</span>Rape_frequency,y<span style="color:#f92672">=</span>Assault))<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_bar</span>(stat<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;summary&#34;</span>,fun<span style="color:#f92672">=</span>mean,fill<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pink&#34;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(strip.text<span style="color:#f92672">=</span><span style="color:#a6e22e">element_text</span>(size<span style="color:#f92672">=</span><span style="color:#ae81ff">12</span>))<span style="color:#f92672">+</span><span style="color:#a6e22e">ylab</span>(<span style="color:#e6db74">&#34;Mean Assault Occurence Per 100,000&#34;</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">xlab</span>(<span style="color:#e6db74">&#34;Rape Frequency per 100,000&#34;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">ggtitle</span>(<span style="color:#e6db74">&#34;Mean Assault in US by Rape Commonality&#34;</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">facet_wrap</span>(<span style="color:#f92672">~</span>HS_Grad_level)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_errorbar</span>(stat<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;summary&#34;</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">.5</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">coord_flip</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p><em>The scatterplot between the average murder and percent illiterate displays many interesting information in the data. Overall, there appears to be a fairly linear relaitonship between illiteracy and average murder. The low percent grad group (triangle) are largely clustered in the upper right of the graph corresponding to high percent illiterate and high average murder. The lower income (redish color) also tends to be higher in both average murder and illiteracy while the higher income (purple/blue color) is lower on illiteracy but still fairly high on average murder. Finally the smaller shapes (lower population) are both low on illiteracy and low on murder.</em></p>
+<p><em>The bar graph contains information on the mean assault occurence for groups differentiated by rape frequency (at/below average or above average) and is faceted by percent graduation groups. While there were more assaults for the above average rape groups as compared to the at/below average rape group for each grad facet, this difference was only significant for the high and medium graduation facets.The most obvious difference was found in the medium grad facet in which the above average rape had more than double the assualt occurrences that the at/below average rape group. Although there was no significant difference in the low percent grad facet, assault rates were higher for the at/below average rape group when compared to the high and medium facets while the assault occurence for the above average rape group was fairly similar to the high and medium facets</em></p>
+<p>#PCA Analysis</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_width<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">vector</span>()
+state_crime_num <span style="color:#f92672">&lt;-</span>state_crime <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">select_if</span>(is.numeric) <span style="color:#f92672">%&gt;%</span> scale
+<span style="color:#a6e22e">rownames</span>(state_crime_num)<span style="color:#f92672">&lt;-</span>state_crime<span style="color:#f92672">$</span>state
+state_pca<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">princomp</span>(state_crime_num)
+<span style="color:#a6e22e">summary</span>(state_pca,loadings<span style="color:#f92672">=</span>T)
+</code></pre></div><pre><code>## Importance of components:
+##                          Comp.1    Comp.2     Comp.3     Comp.4     Comp.5
+## Standard deviation     2.303062 1.7181178 1.07898739 0.95543740 0.84824184
+## Proportion of Variance 0.416334 0.2317056 0.09138256 0.07165311 0.05647678
+## Cumulative Proportion  0.416334 0.6480396 0.73942214 0.81107525 0.86755203
+##                            Comp.6     Comp.7     Comp.8     Comp.9    Comp.10
+## Standard deviation     0.70768909 0.59805481 0.50878902 0.44878515 0.39525469
+## Proportion of Variance 0.03931113 0.02807453 0.02031917 0.01580911 0.01226266
+## Cumulative Proportion  0.90686316 0.93493770 0.95525687 0.97106598 0.98332864
+##                           Comp.11     Comp.12      Comp.13
+## Standard deviation     0.37436525 0.268781988 2.770242e-08
+## Proportion of Variance 0.01100073 0.005670625 6.023735e-17
+## Cumulative Proportion  0.99432938 1.000000000 1.000000e+00
+## 
+## Loadings:
+##               Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7 Comp.8 Comp.9
+## Murder_1975    0.412         0.116                                     0.301
+## Murder_1976    0.395         0.102 -0.284  0.129                       0.291
+## Murder_Change  0.209                0.863         0.189  0.152 -0.115  0.148
+## Assault        0.338  0.237  0.203               -0.155        -0.125 -0.715
+## Rape           0.192  0.395  0.368 -0.235 -0.201         0.334         0.251
+## driver_crash   0.183 -0.356  0.166 -0.165 -0.309  0.729  0.109  0.236 -0.269
+## Population     0.125  0.324 -0.446 -0.154  0.527  0.437  0.215 -0.140       
+##               Comp.10 Comp.11 Comp.12 Comp.13
+## Murder_1975                    0.394   0.734 
+## Murder_1976            0.114   0.482  -0.622 
+## Murder_Change         -0.144          -0.270 
+## Assault       -0.440   0.115   0.144         
+## Rape          -0.106   0.215  -0.585         
+## driver_crash   0.118                         
+## Population    -0.134  -0.302                 
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 6 rows ]
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">eigval<span style="color:#f92672">&lt;-</span>state_pca<span style="color:#f92672">$</span>sdev^2
+varprop<span style="color:#f92672">=</span><span style="color:#a6e22e">round</span>(eigval<span style="color:#f92672">/</span><span style="color:#a6e22e">sum</span>(eigval),<span style="color:#ae81ff">2</span>)
+
+<span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_bar</span>(<span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span>varprop, x<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">13</span>), stat<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;identity&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">xlab</span>(<span style="color:#e6db74">&#34;Principle Component&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_path</span>(<span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span>varprop, x<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">13</span>)) <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(x<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">13</span>, y<span style="color:#f92672">=</span>varprop, label<span style="color:#f92672">=</span><span style="color:#a6e22e">round</span>(varprop, <span style="color:#ae81ff">2</span>)), vjust<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, col<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;white&#34;</span>, size<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>) <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">scale_y_continuous</span>(breaks<span style="color:#f92672">=</span><span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">.6</span>, <span style="color:#ae81ff">.2</span>), labels <span style="color:#f92672">=</span> scales<span style="color:#f92672">::</span>percent) <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">scale_x_continuous</span>(breaks<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">statedf1<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">data.frame</span>(PC1<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span>], PC2<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">2</span>])<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;state&#34;</span>) 
+statedf1<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(PC1,PC2)) <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_point</span>(<span style="color:#a6e22e">aes</span>(color<span style="color:#f92672">=</span>state))
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">statedf2<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">data.frame</span>(PC2<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">2</span>], PC3<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">3</span>])<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;state&#34;</span>) 
+statedf2<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(PC2,PC3)) <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_point</span>(<span style="color:#a6e22e">aes</span>(color<span style="color:#f92672">=</span>state))
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">statedf3<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">data.frame</span>(PC1<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span>], PC3<span style="color:#f92672">=</span>state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">3</span>])<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">rownames_to_column</span>(<span style="color:#e6db74">&#34;state&#34;</span>) 
+statedf3<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(PC1,PC3)) <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_point</span>(<span style="color:#a6e22e">aes</span>(color<span style="color:#f92672">=</span>state))
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>]<span style="color:#f92672">%&gt;%</span>as.data.frame<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">3</span>,Comp.1)
+</code></pre></div><pre><code>##                  Comp.1    Comp.2      Comp.3
+## Louisiana      4.718556 -1.179871 -0.74290004
+## Mississippi    4.547700 -2.260555  0.06371998
+## South Carolina 4.555298 -2.247276  0.62776375
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>]<span style="color:#f92672">%&gt;%</span>as.data.frame<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">1</span>,Comp.2)
+</code></pre></div><pre><code>##             Comp.1   Comp.2    Comp.3
+## California 1.00854 4.598697 -1.687163
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>]<span style="color:#f92672">%&gt;%</span>as.data.frame<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">-1</span>,Comp.2)
+</code></pre></div><pre><code>##                  Comp.1    Comp.2     Comp.3
+## West Virginia 0.3706651 -3.807781 -0.2030673
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">state_pca<span style="color:#f92672">$</span>scores[,<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>]<span style="color:#f92672">%&gt;%</span>as.data.frame<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">2</span>,Comp.3)
+</code></pre></div><pre><code>##           Comp.1   Comp.2   Comp.3
+## Alaska 0.6550110 1.757368 3.882303
+## Nevada 0.6032083 2.623359 3.438016
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">fviz_pca_biplot</span>(state_pca)
+</code></pre></div><p><!-- raw HTML omitted -->
+<em>PCs 1-3 were chosen based on Kaiser&rsquo;s Law. As a result, 74% of the variance was covered. Principle component 1 has strong, positive values for murder, assault, and illiteracy and similarly strong negative values for life expectancy, high school graduation rates, and frost. PC2 has high, positive values for rape, urban population, income, and high school graduation rates as weel as a strong, negative value for driver crashes. Finally, PC3 is most differentiated based on high rape and frost and low population.</em></p>
+<p><em>Lousisiana, Mississippi, and South Carolina are separated by their high score on PC1 and California and West Virginia aaare separated by their high and low scores on PC2, respectively. Alaska and Nevada are very high on PC3. The PCA biplot shows how each variable contributes, or fails to contribute to PC1 and PC2. This graphs confirms that the original conclusions on which variables contributed most to each PC are correct.</em></p>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

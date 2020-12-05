@@ -37,6 +37,14 @@
   </url>
   
   <url>
+    <loc>/project/project1.knit/</loc>
+  </url>
+  
+  <url>
+    <loc>/project/project1.utf8/</loc>
+  </url>
+  
+  <url>
     <loc>/projects/</loc>
   </url>
   

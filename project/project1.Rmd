@@ -1,8 +1,174 @@
 ---
-title: "Project 1"
-author: "Me"
-date: "2020-12-01"
-output: html_document
+title: "Project 1: State Crime"
+author: "Emma Aldred-efa364"
+date: "10/18/2020"
+output: 
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
 ---
 
-## Test Project 1
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+```
+#Introduction
+  *This project analyzes portions of three datasets that provide information on all of the 50 US states, excluding the District of Columbia. Each datset provides either information on crime, car crashes, or population statistics in each state. I chose these datasets because I wanted to see if there was a connection between state statistics (income, illiteracy, etc), reckless driving, and/or crime. I expected that with more poverty, less education, and higher urban populations I would find more crime and reckless driving. All datsets were loaded within the R dataset package.*
+  
+  *The bad_drivers dataset, found within the library fivethirtyeight, was an interesting datset in which the variables drivers_crash was found. These variables provided information about the number of drivers involved in fatal collisions per billion miles for each state and these percent of the crashed that involved speeding and alochol.*
+  
+  *The USArrests dataset, found within the library datasets, provided the variables Murder_1973, Assault, UrbanPop, and Rape which contained data on the number of murders, assaults, and rapes per 100,000 in 1973 for each state as well as the percent urban population.*
+  
+  *The state.x77 dataset, found within the library datasets, contained state facts and figures collected over various years in the 70s. The variables from this dataset used in the analysis were Murder_1976, population, income, illiteracy, life_exp, HS_Grad (percent high-school graduates), and frost (mean number of days with temperaature below freezing).*
+
+#Package loading
+```{r cars}
+library(tidyverse)
+library(dplyr)
+library(cluster)
+library(GGally)
+library(factoextra)
+library(fivethirtyeight) #for dataset bad_drivers
+library(datasets) #for dataset USArrests and state.x77
+?bad_drivers
+?USArrests
+?state.x77
+```
+
+#Tidy Data and Join for Combined Datset
+```{R}
+bad_drivers_dirty<-bad_drivers %>% pivot_longer(contains("perc_"), values_to="Value") %>%
+  separate(name,into=c("Percent","Offense"),sep = "\\_")%>%glimpse()
+#pivot_longer was used to untidy the bad_drivers dataset so that all offenses were in one column
+
+bad_drivers_clean<-bad_drivers_dirty %>% unite(Percent,Offense,col="Crime",sep = "_") %>%
+  pivot_wider(names_from="Crime",values_from="Value") %>%glimpse()
+#pivot_wider was used to retidy the dataset so that each state had only one observation and each crime had its own column
+
+USArrests<-USArrests %>% rownames_to_column("state") 
+#rownames_to_column was used to make a column named 'state' from the rownames
+
+USArrests_dirty<-USArrests%>%pivot_longer(2:5,names_to="crime", values_to="per100k")%>% glimpse()
+#pivot longer was used to untidy the USArrests dataset so that all the crimes were in one column
+
+USArrests_clean<-USArrests_dirty%>%pivot_wider(names_from="crime",values_from="per100k")%>%rename(Murder_1975=Murder)%>%glimpse()
+#pivot wider was use to retidy the USArrests dataet so each crime had its own column and each state had only one observation. The murder column was renamed so it could be differentiated by year
+
+state.x77<-state.x77%>%as.data.frame() %>% rename(Murder_1976=Murder)%>%rownames_to_column("state")
+#state.x77 was changed from a matrix to a dataframe and it's murder value was differentiated by year
+
+state_crime<-left_join(USArrests_clean,bad_drivers_clean)%>%left_join(.,state.x77)
+#Two left joins were used to combine all three datasets by state
+
+state_crime<-state_crime[,c(1,2,17,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20)]
+#the columns were rearranged to be in a more logical order
+
+state_crime<-state_crime%>%select(-insurance_premiums,-losses,-perc_speeding,-perc_alcohol,-perc_not,-perc_no,-Area)
+#Variables that would not be used in the analysis were dropped to make the data easier to view
+```
+
+*The datasets were joined by the common ID variable "state". A left join was used since USArrests and state.x77 included the 50 states only and bad_drivers included the 50 states + the District of Columbia. Therefore, the left join dropped DC so that every state would have a value for each variable in the combined dataset.*
+
+#Wrangling - Summary Statistics
+```{R}
+#Part1:Exploring the dataset
+
+state_crime<-state_crime%>%mutate(Murder_Change=Murder_1975-Murder_1976)%>%rename(driver_crash=num_drivers)%>%rename(HS_Grad=`HS Grad`,Life_Exp=`Life Exp`)
+#create new variable for change in murder between the years 1975 and 1976 and rename variables to exclude spaces
+
+state_crime<-state_crime[,c("state","Murder_1975","Murder_1976","Murder_Change","Assault","Rape","driver_crash", "Population","UrbanPop","Life_Exp","Income","Illiteracy","HS_Grad","Frost")]
+#reorganize variable order
+
+state_crime%>%summarize(quantile(HS_Grad))
+state_crime<-state_crime%>%mutate(HS_Grad_level=case_when(HS_Grad>59.15~"High_percent_grad",
+                                             HS_Grad>=48.05 & HS_Grad<=59.15~"Med_percent_grad",
+                                             HS_Grad<48.05~"Low_percent_grad")) 
+#new categorical variable for HS_Grad_level made based on quantile distinction for HS_grad
+
+state_crime%>%filter(Population>mean(Population))%>%select(state,Murder_Change,Illiteracy)%>%arrange(Illiteracy)
+#exploratory analysis on murder_change and illiteracy levels for the states that have a population greater than the mean populataion; no obvious connection was found
+
+state_crime%>%group_by(HS_Grad_level)%>%summarize(median(Rape),median(Assault),cor(Rape,Assault),mean(UrbanPop))
+#exploratory analysis on rape, assault, the correlation between them, and urban population when grouped by HS_Grad_level; grouping by high school grad level showed differences in some of these values and showed that high and medium grad levels are more similar overall than the low grad level
+
+#Part2:Summary Statistics for Numeric Variables
+
+state_crime%>%summarize(mean(Assault),mean(Rape),max(Murder_Change),min(Murder_Change),median(Murder_1975),median(Murder_1976),median(Population),sd(Population),median(driver_crash),cor(Illiteracy,HS_Grad))
+
+state_crime%>%group_by(HS_Grad_level)%>%summarize(mean(Assault),mean(Rape),mean(Murder_Change),max(Murder_Change),min(Murder_Change),median(Murder_1975),median(Murder_1976),median(Population),sd(Population),median(driver_crash),cor(Illiteracy,HS_Grad),cor(UrbanPop,driver_crash),cor(Income,Life_Exp))
+
+cormat<-state_crime%>%select_if(is.numeric)%>%cor
+```
+  *State_crime was explored by using various summary statistics. Mutate was use to make a variable corresponding to the change in murder per 100,000 between the years 1975 and 1976. Along with case_when, another categorical variable was made to categorize high school graduation rates depending on if they were below the 25th percentile (low), in between the 25th and 75th percentile (medium), or above the 75th percentile (high).* 
+  
+  *Similar summary statistics were calculated overall in the dataset and after grouping by HS_Grad_level. Interestingly, values found in overall summary did not reflect the values found when grouping by high school graduation. The low graduation group had a higher mean assault score but the high graduation group had a higher mean rape score. Only the high grad group had a negative murder change between 1975 and 1976 and murder in both years was much higher for the low grad group. The med and high grad groups had a positive correlation between illiteracy and HS_grad, but this correlation was negative when calculaated without grouping. Finally,the high grad group was the only group with a negative correlation between income and life expectancy. These differences provide evidence graduation level is correlated with various crime statistics.*
+
+#Visualizations
+```{R}
+tidycor <- cormat %>% as.data.frame %>% rownames_to_column("Variable_1") %>%
+pivot_longer(-1,names_to="Variable_2",values_to="correlation")
+
+tidycor%>%ggplot(aes(Variable_1,Variable_2,fill=correlation))+geom_tile()+ scale_fill_gradient2(low="red",mid="white",high="blue")+theme(axis.text.x = element_text(angle = 90, hjust=1))+ coord_fixed()+ggtitle("Correlation Matrix for US State Data")
+
+state_crime%>%mutate(avg_murder=((Murder_1976+Murder_1975)/2))%>%
+  ggplot(aes(x=Illiteracy,y=avg_murder,color=Income,shape=HS_Grad_level))+scale_color_gradient(low="red",high="blue")+geom_point(aes(size=Population))+
+  ggtitle("Average Murder Per 100,000 1975-1976 by Illiteracy")+theme(legend.background=element_rect(fill="lightgray"))+xlab("Percent Illiterate")+ ylab("Average Murder per 100,000")+
+  scale_x_continuous(n.breaks=10)+scale_y_continuous(n.breaks=10)
+
+state_crime%>%summarize(quantile(Rape))
+state_crime%>%mutate(Rape_frequency=case_when(Rape>20.100~"Above Average",
+                                              Rape<=20.100~"At or Below Average"))%>%
+  ggplot(aes(x=Rape_frequency,y=Assault))+geom_bar(stat="summary",fun=mean,fill="pink")+
+  theme(strip.text=element_text(size=12))+ylab("Mean Assault Occurence Per 100,000")+xlab("Rape Frequency per 100,000")+
+  ggtitle("Mean Assault in US by Rape Commonality")+facet_wrap(~HS_Grad_level)+
+  geom_errorbar(stat="summary", width=.5)+coord_flip()
+
+```
+  
+  *The scatterplot between the average murder and percent illiterate displays many interesting information in the data. Overall, there appears to be a fairly linear relaitonship between illiteracy and average murder. The low percent grad group (triangle) are largely clustered in the upper right of the graph corresponding to high percent illiterate and high average murder. The lower income (redish color) also tends to be higher in both average murder and illiteracy while the higher income (purple/blue color) is lower on illiteracy but still fairly high on average murder. Finally the smaller shapes (lower population) are both low on illiteracy and low on murder.*
+  
+  *The bar graph contains information on the mean assault occurence for groups differentiated by rape frequency (at/below average or above average) and is faceted by percent graduation groups. While there were more assaults for the above average rape groups as compared to the at/below average rape group for each grad facet, this difference was only significant for the high and medium graduation facets.The most obvious difference was found in the medium grad facet in which the above average rape had more than double the assualt occurrences that the at/below average rape group. Although there was no significant difference in the low percent grad facet, assault rates were higher for the at/below average rape group when compared to the high and medium facets while the assault occurence for the above average rape group was fairly similar to the high and medium facets*
+
+#PCA Analysis
+```{R}
+state_width<-vector()
+state_crime_num <-state_crime %>% select_if(is.numeric) %>% scale
+rownames(state_crime_num)<-state_crime$state
+state_pca<-princomp(state_crime_num)
+summary(state_pca,loadings=T)
+eigval<-state_pca$sdev^2
+varprop=round(eigval/sum(eigval),2)
+
+ggplot() + geom_bar(aes(y=varprop, x=1:13), stat="identity") + xlab("Principle Component") + geom_path(aes(y=varprop, x=1:13)) + 
+  geom_text(aes(x=1:13, y=varprop, label=round(varprop, 2)), vjust=1, col="white", size=5) + 
+  scale_y_continuous(breaks=seq(0, .6, .2), labels = scales::percent) + 
+  scale_x_continuous(breaks=1:10)
+
+statedf1<-data.frame(PC1=state_pca$scores[,1], PC2=state_pca$scores[,2])%>%rownames_to_column("state") 
+statedf1%>%ggplot(aes(PC1,PC2)) + geom_point(aes(color=state))
+
+statedf2<-data.frame(PC2=state_pca$scores[,2], PC3=state_pca$scores[,3])%>%rownames_to_column("state") 
+statedf2%>%ggplot(aes(PC2,PC3)) + geom_point(aes(color=state))
+
+statedf3<-data.frame(PC1=state_pca$scores[,1], PC3=state_pca$scores[,3])%>%rownames_to_column("state") 
+statedf3%>%ggplot(aes(PC1,PC3)) + geom_point(aes(color=state))
+
+state_pca$scores[,1:3]%>%as.data.frame%>%top_n(3,Comp.1)
+state_pca$scores[,1:3]%>%as.data.frame%>%top_n(1,Comp.2)
+state_pca$scores[,1:3]%>%as.data.frame%>%top_n(-1,Comp.2)
+state_pca$scores[,1:3]%>%as.data.frame%>%top_n(2,Comp.3)
+fviz_pca_biplot(state_pca)
+
+```
+*PCs 1-3 were chosen based on Kaiser's Law. As a result, 74% of the variance was covered. Principle component 1 has strong, positive values for murder, assault, and illiteracy and similarly strong negative values for life expectancy, high school graduation rates, and frost. PC2 has high, positive values for rape, urban population, income, and high school graduation rates as weel as a strong, negative value for driver crashes. Finally, PC3 is most differentiated based on high rape and frost and low population.*
+
+*Lousisiana, Mississippi, and South Carolina are separated by their high score on PC1 and California and West Virginia aaare separated by their high and low scores on PC2, respectively. Alaska and Nevada are very high on PC3. The PCA biplot shows how each variable contributes, or fails to contribute to PC1 and PC2. This graphs confirms that the original conclusions on which variables contributed most to each PC are correct.*  
+
+
+
+
