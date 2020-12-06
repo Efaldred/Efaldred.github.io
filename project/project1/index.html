@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="author" content="Emma Faye Aldred" />
+    <meta name="author" content="Emma Aldred" />
     
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
     <title>Project 1: State Crime</title>
@@ -74,12 +74,12 @@
 <script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
 
-<p>Introduction</p>
+<p><B>Introduction</B></p>
 <p>This project analyzes portions of three datasets that provide information on all of the 50 US states, excluding the District of Columbia. Each datset provides either information on crime, car crashes, or population statistics in each state. I chose these datasets because I wanted to see if there was a connection between state statistics (income, illiteracy, etc), reckless driving, and/or crime. I expected that with more poverty, less education, and higher urban populations I would find more crime and reckless driving. All datsets were loaded within the R dataset package.</p>
 <p>The bad_drivers dataset, found within the library fivethirtyeight, was an interesting datset in which the variables drivers_crash was found. These variables provided information about the number of drivers involved in fatal collisions per billion miles for each state and these percent of the crashed that involved speeding and alochol.</p>
 <p>The USArrests dataset, found within the library datasets, provided the variables Murder_1973, Assault, UrbanPop, and Rape which contained data on the number of murders, assaults, and rapes per 100,000 in 1973 for each state as well as the percent urban population.</p>
 <p>The state.x77 dataset, found within the library datasets, contained state facts and figures collected over various years in the 70s. The variables from this dataset used in the analysis were Murder_1976, population, income, illiteracy, life_exp, HS_Grad (percent high-school graduates), and frost (mean number of days with temperaature below freezing).</p>
-<p>Package loading</p>
+<p><B>Package loading</B></p>
 <pre class="r"><code>library(tidyverse)
 library(dplyr)
 library(cluster)
@@ -90,7 +90,7 @@ library(datasets) #for dataset USArrests and state.x77
 ?bad_drivers
 ?USArrests
 ?state.x77</code></pre>
-<p>Tidy Data and Join for Combined Datset</p>
+<p><B>Tidy Data and Join for Combined Datset</B></p>
 <pre class="r"><code>bad_drivers_dirty&lt;-bad_drivers %&gt;% pivot_longer(contains(&quot;perc_&quot;), values_to=&quot;Value&quot;) %&gt;%
   separate(name,into=c(&quot;Percent&quot;,&quot;Offense&quot;),sep = &quot;\\_&quot;)%&gt;%glimpse()</code></pre>
 <pre><code>## Rows: 204
@@ -150,8 +150,8 @@ state_crime&lt;-state_crime[,c(1,2,17,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,2
 
 state_crime&lt;-state_crime%&gt;%select(-insurance_premiums,-losses,-perc_speeding,-perc_alcohol,-perc_not,-perc_no,-Area)
 #Variables that would not be used in the analysis were dropped to make the data easier to view</code></pre>
-<p><em>The datasets were joined by the common ID variable “state”. A left join was used since USArrests and state.x77 included the 50 states only and bad_drivers included the 50 states + the District of Columbia. Therefore, the left join dropped DC so that every state would have a value for each variable in the combined dataset.</em></p>
-<p>Wrangling - Summary Statistics</p>
+<p>The datasets were joined by the common ID variable “state”. A left join was used since USArrests and state.x77 included the 50 states only and bad_drivers included the 50 states + the District of Columbia. Therefore, the left join dropped DC so that every state would have a value for each variable in the combined dataset.</p>
+<p><B>Wrangling</B> - <em>Summary Statistics</em></p>
 <pre class="r"><code>#Part1:Exploring the dataset
 
 state_crime&lt;-state_crime%&gt;%mutate(Murder_Change=Murder_1975-Murder_1976)%&gt;%rename(driver_crash=num_drivers)%&gt;%rename(HS_Grad=`HS Grad`,Life_Exp=`Life Exp`)
@@ -230,9 +230,9 @@ state_crime%&gt;%summarize(mean(Assault),mean(Rape),max(Murder_Change),min(Murde
 ## #   `median(driver_crash)` &lt;dbl&gt;, `cor(Illiteracy, HS_Grad)` &lt;dbl&gt;,
 ## #   `cor(UrbanPop, driver_crash)` &lt;dbl&gt;, `cor(Income, Life_Exp)` &lt;dbl&gt;</code></pre>
 <pre class="r"><code>cormat&lt;-state_crime%&gt;%select_if(is.numeric)%&gt;%cor</code></pre>
-<p><em>State_crime was explored by using various summary statistics. Mutate was use to make a variable corresponding to the change in murder per 100,000 between the years 1975 and 1976. Along with case_when, another categorical variable was made to categorize high school graduation rates depending on if they were below the 25th percentile (low), in between the 25th and 75th percentile (medium), or above the 75th percentile (high).</em></p>
-<p><em>Similar summary statistics were calculated overall in the dataset and after grouping by HS_Grad_level. Interestingly, values found in overall summary did not reflect the values found when grouping by high school graduation. The low graduation group had a higher mean assault score but the high graduation group had a higher mean rape score. Only the high grad group had a negative murder change between 1975 and 1976 and murder in both years was much higher for the low grad group. The med and high grad groups had a positive correlation between illiteracy and HS_grad, but this correlation was negative when calculaated without grouping. Finally,the high grad group was the only group with a negative correlation between income and life expectancy. These differences provide evidence graduation level is correlated with various crime statistics.</em></p>
-<p>Visualizations</p>
+<p>State_crime was explored by using various summary statistics. Mutate was use to make a variable corresponding to the change in murder per 100,000 between the years 1975 and 1976. Along with case_when, another categorical variable was made to categorize high school graduation rates depending on if they were below the 25th percentile (low), in between the 25th and 75th percentile (medium), or above the 75th percentile (high).</p>
+<p>Similar summary statistics were calculated overall in the dataset and after grouping by HS_Grad_level. Interestingly, values found in overall summary did not reflect the values found when grouping by high school graduation. The low graduation group had a higher mean assault score but the high graduation group had a higher mean rape score. Only the high grad group had a negative murder change between 1975 and 1976 and murder in both years was much higher for the low grad group. The med and high grad groups had a positive correlation between illiteracy and HS_grad, but this correlation was negative when calculated without grouping. Finally,the high grad group was the only group with a negative correlation between income and life expectancy. These differences provide evidence graduation level is correlated with various crime statistics.</p>
+<p><B>Visualizations</B></p>
 <pre class="r"><code>tidycor &lt;- cormat %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;Variable_1&quot;) %&gt;%
 pivot_longer(-1,names_to=&quot;Variable_2&quot;,values_to=&quot;correlation&quot;)
 
@@ -259,9 +259,9 @@ tidycor%&gt;%ggplot(aes(Variable_1,Variable_2,fill=correlation))+geom_tile()+ sc
   ggtitle(&quot;Mean Assault in US by Rape Commonality&quot;)+facet_wrap(~HS_Grad_level)+
   geom_errorbar(stat=&quot;summary&quot;, width=.5)+coord_flip()</code></pre>
 <p><img src="/project/project1_files/figure-html/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
-<p><em>The scatterplot between the average murder and percent illiterate displays many interesting information in the data. Overall, there appears to be a fairly linear relaitonship between illiteracy and average murder. The low percent grad group (triangle) are largely clustered in the upper right of the graph corresponding to high percent illiterate and high average murder. The lower income (redish color) also tends to be higher in both average murder and illiteracy while the higher income (purple/blue color) is lower on illiteracy but still fairly high on average murder. Finally the smaller shapes (lower population) are both low on illiteracy and low on murder.</em></p>
-<p><em>The bar graph contains information on the mean assault occurence for groups differentiated by rape frequency (at/below average or above average) and is faceted by percent graduation groups. While there were more assaults for the above average rape groups as compared to the at/below average rape group for each grad facet, this difference was only significant for the high and medium graduation facets.The most obvious difference was found in the medium grad facet in which the above average rape had more than double the assualt occurrences that the at/below average rape group. Although there was no significant difference in the low percent grad facet, assault rates were higher for the at/below average rape group when compared to the high and medium facets while the assault occurence for the above average rape group was fairly similar to the high and medium facets</em></p>
-<p>PCA Analysis</p>
+<p>The scatterplot between the average murder and percent illiterate displays many interesting information in the data. Overall, there appears to be a fairly linear relaitonship between illiteracy and average murder. The low percent grad group (triangle) are largely clustered in the upper right of the graph corresponding to high percent illiterate and high average murder. The lower income (redish color) also tends to be higher in both average murder and illiteracy while the higher income (purple/blue color) is lower on illiteracy but still fairly high on average murder. Finally the smaller shapes (lower population) are both low on illiteracy and low on murder.</p>
+<p>The bar graph contains information on the mean assault occurence for groups differentiated by rape frequency (at/below average or above average) and is faceted by percent graduation groups. While there were more assaults for the above average rape groups as compared to the at/below average rape group for each grad facet, this difference was only significant for the high and medium graduation facets.The most obvious difference was found in the medium grad facet in which the above average rape had more than double the assualt occurrences that the at/below average rape group. Although there was no significant difference in the low percent grad facet, assault rates were higher for the at/below average rape group when compared to the high and medium facets while the assault occurence for the above average rape group was fairly similar to the high and medium facets</p>
+<p><B>PCA Analysis</B></p>
 <pre class="r"><code>state_width&lt;-vector()
 state_crime_num &lt;-state_crime %&gt;% select_if(is.numeric) %&gt;% scale
 rownames(state_crime_num)&lt;-state_crime$state
@@ -333,8 +333,8 @@ statedf3%&gt;%ggplot(aes(PC1,PC3)) + geom_point(aes(color=state))</code></pre>
 ## Nevada 0.6032083 2.623359 3.438016</code></pre>
 <pre class="r"><code>fviz_pca_biplot(state_pca)</code></pre>
 <p><img src="/project/project1_files/figure-html/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" />
-<em>PCs 1-3 were chosen based on Kaiser’s Law. As a result, 74% of the variance was covered. Principle component 1 has strong, positive values for murder, assault, and illiteracy and similarly strong negative values for life expectancy, high school graduation rates, and frost. PC2 has high, positive values for rape, urban population, income, and high school graduation rates as weel as a strong, negative value for driver crashes. Finally, PC3 is most differentiated based on high rape and frost and low population.</em></p>
-<p><em>Lousisiana, Mississippi, and South Carolina are separated by their high score on PC1 and California and West Virginia aaare separated by their high and low scores on PC2, respectively. Alaska and Nevada are very high on PC3. The PCA biplot shows how each variable contributes, or fails to contribute to PC1 and PC2. This graphs confirms that the original conclusions on which variables contributed most to each PC are correct.</em></p>
+PCs 1-3 were chosen based on Kaiser’s Law. As a result, 74% of the variance was covered. Principle component 1 has strong, positive values for murder, assault, and illiteracy and similarly strong negative values for life expectancy, high school graduation rates, and frost. PC2 has high, positive values for rape, urban population, income, and high school graduation rates as weel as a strong, negative value for driver crashes. Finally, PC3 is most differentiated based on high rape and frost and low population.</p>
+<p>Lousisiana, Mississippi, and South Carolina are separated by their high score on PC1 and California and West Virginia aaare separated by their high and low scores on PC2, respectively. Alaska and Nevada are very high on PC3. The PCA biplot shows how each variable contributes, or fails to contribute to PC1 and PC2. This graphs confirms that the original conclusions on which variables contributed most to each PC are correct.</p>
 
             
         <hr>         <div class="related-posts">

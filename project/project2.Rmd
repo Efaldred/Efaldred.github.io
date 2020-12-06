@@ -18,7 +18,7 @@ library(tidyverse);library(lmtest);library(plotROC);library(glmnet)
 library(sandwich);library(readr);library(rstatix)
 ```
 
-Introduction
+<B>Introduction</B>
   
   This project analyzes variables within the dataset "Guns" uploaded as a CSV from https://vincentarelbundock.github.io/Rdatasets/datasets.html. The Guns dataset has data from 1977-1999 in all 50 US states and the District of Columbia. The data collected includes "violent" crime rate, "murder" rate, "robbery" rate, and "prisoners" - incarceration rate from the previous year - all per 100,000 members of the population. It also have demographic variables: "afam" is the percent of the state population (ages 10-64) that is African American, "cauc" is the percent of the state population (ages 10-64) that is Caucasian, "male" is the percent of the state population (ages 10-29) that is male, state "population" in millions of people, mean personal "income" in US dollars, and population "density". Finally, the dataset includes a variable "law" which is a yes/no variable for whether or not the state has a shall carry law in effect for the year. Each state + DC has a value for each of the variables listed above for all the years between 1977-1999 making a total of 1,172 observations.
 
@@ -27,7 +27,7 @@ Guns<- read.csv("Guns.csv")
 head(Guns)
 ```
 
-MANOVA Test
+<B>MANOVA Test</B>
 ```{r pressure, echo=FALSE}
 group <- Guns$law 
 DVs <- Guns %>% select(violent,murder,robbery,prisoners,afam,cauc,male,population,income,density)
@@ -54,7 +54,7 @@ Guns%>%group_by(law)%>%summarize(mean(violent),mean(murder),mean(robbery),mean(a
   The MANOVA test was done on all numeric variables in the dataset (year is considered a categorical label). The assumptions for MANOVA were not met and, therefore, I am skeptical about the finding from this test. Regardless, the MANOVA test was conducted to determine the effect of the variable law on various crime statistics (violent, murder, robbery, prisoner) and demographics (afam, cauc, male, population, and density). 
   Significant differences were found among law for at least one of the dependent variables (Pillai trace= 0.23, psuedo F(10,1162)=35.474, p<.0001). 10 univariate ANOVAs were performed as a follow up and were significant for violent (F(1,1171)=52.364,p<.0001), murder (F(1,1171)=38.944,p<.0001), robbery (F(1,1171)=55.363,p<.0001), afam (F(1,1171)=41.009,p<.0001), cauc (F(1,1171)=55.29,p<.0001), male (F(1,1171)=97.477,p<.0001), population (F(1,1171)=18.397,p<.0001), and density (F(1,1171)=15.04,p<.0001). A post hoc analysis did not need to be perfomed since there are only two categories for the law variable (yes/no). Law - yes or no - was found to differ significantly from in terms of violent, murder, robbery, afam, cauc, male, population, and density. Since a total of 11 tests were conducted (1 manova and 10 anova), the Bonferroni method was used to control for Type 1 error rates for multiple comparisons. Without this correction, the probability of at least one 1 type error would be .43; Therefore, a p-value of 0.0045 was used, but this correction did not change the significance of any off the variables.
 
-Randomization Test
+<B>Randomization Test</B>
 ```{R}
 #Ho: mean violent crime rate is the same for states with and without shall carry laws
 #Ha: mean violent crime rate is different for states with and without shall carry laws
@@ -75,7 +75,7 @@ Ho: mean violent crime rate is the same for states with and without shall carry 
 Ha: mean violent crime rate is different for states with and without shall carry laws.
 A p value of 0.00 was computed which is less that .001 and, therefore, the null hypothesis can be rejected. There is evidence that the mean violent crime rate is different for states with and without shall carry laws
 
-Linear Regression Model
+<B>Linear Regression Model</B>
 ```{R}
 Guns$y<-ifelse(Guns$law=="yes",1,0)
 Guns$prisoners_c<-Guns$prisoners-mean(Guns$prisoners)
@@ -100,7 +100,7 @@ coeftest(fit,vcov=vcovHC(fit))[,1:2]
   The linear fit model showed a fairly linear relationship between mean violent crime and mean prisoner incarceration rate. The Shapiro-Wilk test in which Ho = there is normally distributed residuals yeilded a p-value of < 2.2e-16 and thus the normality assumption failed. Furthermore, a Breusch-Pagan test was performeed in which Ho = there is equal variance of points/residuals along regression line yeilded a p value < 2.2e-16 and thus the homoskedasticity assumption also failed to be met. In the histogram of the residuals and in the scatterplot of the fitted values and residuals, the majority of the data is clustered together with a smaller - yet noticeable - portion of the data much further out. I predict that the smaller portion of the dataset that deviates from the majority is the likely reason the assumptions failed to be met.
   The robust standard errors of the linear model was computed and the output resulted in the same coefficients but a higher standard error (and thus a higher p value) for the intercept, prisoners_c and the interaction between y and prisoners_c and a lower standard error (and thus lower p value) for y. This model is more resistant to the lack of homoskedasticity than the original model. 55.13% of the variation in mean violent crime is being explained by the linear relationship with mean prisoner incarceration rate and the presence or lack thereof a 'shall carry' law.
 
-Bootstrapped Standard Errors - Resampling the Residuals
+<B>Bootstrapped Standard Errors</B> - *Re-sampling the Residuals*
 ```{R}
 resid_crimesamp<-replicate(5000,{
 new_resids<-sample(resids,replace=TRUE) 
@@ -112,7 +112,7 @@ resid_crimesamp%>%t%>%as.data.frame%>%summarize_all(sd)
 ```
 Bootstrapping the residuals on the same regression model resulted in all standard errors that were less (and thus p values that were less) than the original model and very similar to the robust standard error output. The bootstrapping standard erros were slighlty lower compared to the robust SE output for the intercept (7.455181), prisoners_c (0.04031502), and the interaction between prisoners_c and y (0.09646994) but higher for the dummy variable y for 'shall carry' law (15.17598).
 
-Binary Logistic Regression Model - Prisoners and Violent Crime
+<B>Binary Logistic Regression Model</B> - *Prisoners and Violent Crime*
 ```{R}
 fit2<-glm(y~prisoners_c+violent_c, data=Guns,family="binomial")
 summary(fit2)
@@ -159,7 +159,7 @@ calc_auc(ROCplot)
   A logistic regression model was created to predict the presence or lack thereof a 'shall carry' law in states by prisoner incarceration rate and violent crime rates. For states with the mean prisoner incarceration rate, every unit increase in mean violent crime rates decreases the probability of having a shall carry law by 0.0049733. For states with mean violent crime rates, every unit increase in mean incarceration rates increases the probability of having a 'shall carry' law by 0.0063178. The model is doing bad with an AUC of 0.5864865. It has an accuracy of 0.7851662, sensitivity of 0.2, specificity of 0.972973, and precision of 0.7037037.
   The ROC plot of the model corresponds to an AUC value of 0.7533804 which is fair. There is about a .75 probability that a ranodmy selected state (including DC) with a shall carry law has a higher predicted probability of having the law than a randomly selected state without the shall carry law.
 
-Logistic Regression Model - Complete
+<B>Logistic Regression Model</B> - *Complete*
 ```{R}
 Guns1<-read_csv("Guns.csv")%>%select(-1,-2,-state)
 Guns1$y<-ifelse(Guns1$law=="yes",1,0)
