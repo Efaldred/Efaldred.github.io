@@ -1,0 +1,17 @@
+---
+title: 'Reticulate: R and Python can talk!'
+author: ''
+date: '2020-12-06'
+slug: reticulate-r-and-python-can-talk
+categories: []
+tags: []
+description: ''
+---
+```{R}
+library(reticulate)
+grades<-c(99,76,87,95,50)
+```
+
+```{python3}
+print(r.grades)
+```

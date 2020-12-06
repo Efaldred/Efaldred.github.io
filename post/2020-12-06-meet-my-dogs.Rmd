@@ -1,0 +1,10 @@
+---
+title: Meet My Dogs!
+author: ''
+date: '2020-12-06'
+slug: meet-my-dogs
+categories: []
+tags: []
+description: ''
+---
+![Truffle (left) and Mocha (right) cooling off after a long walk!](/post/2020-12-06-meet-my-dogs_files/Mocha_Truffle.jpeg){width=80% height=80%}
