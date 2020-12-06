@@ -19,6 +19,17 @@ Link to google</description>
     </item>
     
     <item>
+      <title>Functions in Python</title>
+      <link>/post/2020/12/05/learning-python/</link>
+      <pubDate>Sat, 05 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2020/12/05/learning-python/</guid>
+      <description>  Being able to use functions is an essential tool in coding. Functions allow you to perform the same set of code over and over again. This helps save time by applying the same task in various situations. Functions often use iteration and conditionals to be able to perform the desired task.
+Iteration:
+#import numpy as np #import pandas as pd </description>
+    </item>
+    
+    <item>
       <title>Project 1: State Crime</title>
       <link>/project/project1/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -56,7 +67,7 @@ This project analyzes variables within the dataset “Guns” uploaded as a CSV 
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/resume/</guid>
-      <description>     </description>
+      <description>   </description>
     </item>
     
   </channel>

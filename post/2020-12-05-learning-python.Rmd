@@ -1,0 +1,18 @@
+---
+title: Functions in Python
+author: ''
+date: '2020-12-05'
+slug: learning-python
+categories: []
+tags: []
+description: ''
+---
+Being able to use functions is an essential tool in coding. Functions allow you to perform the same set of code over and over again. This helps save time by applying the same task in various situations. Functions often use iteration and conditionals to be able to perform the desired task.
+
+Iteration:
+
+```{python}
+#import numpy as np
+#import pandas as pd
+```
+
