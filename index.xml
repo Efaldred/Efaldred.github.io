@@ -23,7 +23,8 @@
       <pubDate>Sun, 06 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/2020/12/06/reticulate-r-and-python-can-talk/</guid>
-      <description>  library(reticulate) ## Warning: package &amp;#39;reticulate&amp;#39; was built under R version 3.6.2 grades&amp;lt;-c(99,76,87,95,50) print(r.grades) </description>
+      <description>Reticulate is a great package because it lets you use code across R and python. In essence, it is how R and Python talk! Here are a few examples of how reticulate works:
+library(reticulate) ## Warning: package &amp;#39;reticulate&amp;#39; was built under R version 3.6.2 grades&amp;lt;-data.frame(Points=c(99,76,87,95,50),Letter=c(&amp;quot;A&amp;quot;,&amp;quot;C&amp;quot;,&amp;quot;B&amp;quot;,&amp;quot;A&amp;quot;,&amp;quot;F&amp;quot;)) head(grades) ## Points Letter ## 1 99 A ## 2 76 C ## 3 87 B ## 4 95 A ## 5 50 F import numpy as np avg=np.</description>
     </item>
     
     <item>

@@ -74,10 +74,28 @@
 <script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
 
+<p>Reticulate is a great package because it lets you use code across R and python. In essence, it is how R and Python talk! Here are a few examples of how reticulate works:</p>
 <pre class="r"><code>library(reticulate)</code></pre>
 <pre><code>## Warning: package &#39;reticulate&#39; was built under R version 3.6.2</code></pre>
-<pre class="r"><code>grades&lt;-c(99,76,87,95,50)</code></pre>
-<pre class="python3"><code>print(r.grades)</code></pre>
+<pre class="r"><code>grades&lt;-data.frame(Points=c(99,76,87,95,50),Letter=c(&quot;A&quot;,&quot;C&quot;,&quot;B&quot;,&quot;A&quot;,&quot;F&quot;))
+head(grades)</code></pre>
+<pre><code>##   Points Letter
+## 1     99      A
+## 2     76      C
+## 3     87      B
+## 4     95      A
+## 5     50      F</code></pre>
+<pre class="python"><code>import numpy as np
+avg=np.mean(r.grades.Points)
+if avg&gt;90:
+  print(&quot;Your average is an A&quot;)
+elif avg&gt;80:
+  print(&quot;Your average is a B&quot;)
+elif avg&gt;70:
+  print(&quot;Your average is a C&quot;)
+else:
+  print(&quot;Your average is a F&quot;)</code></pre>
+<pre><code>## Your average is a B</code></pre>
 
             
         <hr>         <div class="related-posts">

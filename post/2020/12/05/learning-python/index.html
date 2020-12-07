@@ -75,27 +75,47 @@
 
 
 <p>Being able to use functions is an essential tool in coding. Functions allow you to perform the same set of code over and over again. This helps save time by applying the same task in various situations. Functions often use iteration and conditionals to be able to perform the desired task.</p>
-<pre class="python3"><code>import numpy as np</code></pre>
+<pre class="python"><code>import numpy as np</code></pre>
 <p><B>Iteration</B>: for and while loops are used to continually perform a set of code <em>for</em> a particular amount of times or <em>while</em> a particular statement is true</p>
-<pre class="python3"><code>for i in range(1,11):
-    print(2**i)
-
-i=1
+<pre class="python"><code>for i in range(1,11):
+    print(2**i)</code></pre>
+<pre><code>## 2
+## 4
+## 8
+## 16
+## 32
+## 64
+## 128
+## 256
+## 512
+## 1024</code></pre>
+<pre class="python"><code>i=1
 while i &lt; 11:
     print(2**i)
     i+=1</code></pre>
+<pre><code>## 2
+## 4
+## 8
+## 16
+## 32
+## 64
+## 128
+## 256
+## 512
+## 1024</code></pre>
 <p>These two loops have identical outputs but are slightly different in their logic. The for loop initializes a variable (i) then provides a particular condition (in range(1,11)) that will allow the loop to terminate when the condition is exceeded. The while loop takes a previously initialized variable (i) and then provides a condition so that the loop will continue until the condition is no longer true.</p>
 <p><B>Conditionals</B>: if, elif, and else are useful conditionals that allow you to specify perform various code depending on which condition is true.</p>
-<pre class="python3"><code>x=np.random.randint(-10,10,1) #generate a random number from 1 to 10
+<pre class="python"><code>x=np.random.randint(-10,10,1) #generate a random number from 1 to 10
 if x&gt;0:
     print(&quot;x is greater than zero!&quot;)
 elif x==0:
     print(&quot;x is zero!&quot;)
 else:
   print(&quot;x is less than zero!&quot;)</code></pre>
+<pre><code>## x is less than zero!</code></pre>
 <p>In this example, x is a random integer between -10 and 10. <em>If</em>x is greater than one, the output will print the statement under the if conditional. If the if statement is false, the code will move on to the <em>elif</em> statement and print the corresponding text if true. Finally, if the elif is also false, the <em>else</em> statement will be printed.</p>
 <p><B>Functions</B>: With the conditionals and iterations above, functions can be created to perform complex code that can be applied to various situations.</p>
-<pre class="python3"><code>longhorn = &quot;BEVO XV is the greatest mascot of all time!&quot;
+<pre class="python"><code>longhorn = &quot;BEVO XV is the greatest mascot of all time!&quot;
 
 def count_chars(sentence):
   counts = {}
@@ -107,6 +127,7 @@ def count_chars(sentence):
   print(counts)
   
 count_chars(longhorn)</code></pre>
+<pre><code>## {&#39;B&#39;: 1, &#39;E&#39;: 1, &#39;V&#39;: 2, &#39;O&#39;: 1, &#39; &#39;: 8, &#39;X&#39;: 1, &#39;i&#39;: 2, &#39;s&#39;: 3, &#39;t&#39;: 5, &#39;h&#39;: 1, &#39;e&#39;: 4, &#39;g&#39;: 1, &#39;r&#39;: 1, &#39;a&#39;: 3, &#39;m&#39;: 2, &#39;c&#39;: 1, &#39;o&#39;: 2, &#39;f&#39;: 1, &#39;l&#39;: 2, &#39;!&#39;: 1}</code></pre>
 <p>In this example, we have a function that can determine how many times each character appears in a sentence. The function “count_chars” if defined (def) so that anytime is it called the for loop and if-else statements within it will be applied. The empty vector “counts” stores the information which is then printed. My sentence, stored in the string “longhorn”, was put through the function by calling “count_chars(longhorn)”. Combining the conditionals and iterations within a function allows this set of code to be used for any sentence!</p>
 
             

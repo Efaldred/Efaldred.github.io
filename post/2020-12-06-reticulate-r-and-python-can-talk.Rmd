@@ -7,11 +7,25 @@ categories: []
 tags: []
 description: ''
 ---
+Reticulate is a great package because it lets you use code across R and python. In essence, it is how R and Python talk! Here are a few examples of how reticulate works:
+
 ```{R}
 library(reticulate)
-grades<-c(99,76,87,95,50)
+grades<-data.frame(Points=c(99,76,87,95,50),Letter=c("A","C","B","A","F"))
+head(grades)
 ```
 
-```{python3}
-print(r.grades)
+```{python}
+import numpy as np
+avg=np.mean(r.grades.Points)
+if avg>90:
+  print("Your average is an A")
+elif avg>80:
+  print("Your average is a B")
+elif avg>70:
+  print("Your average is a C")
+else:
+  print("Your average is a F")
 ```
+
+
