@@ -1,7 +1,7 @@
 ---
-title: "Project2"
+title: "Project 2"
 author: "Emma Aldred efa364"
-date: "11/22/2020"
+hidedate: true
 output: 
   html_document:
     toc: yes

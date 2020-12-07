@@ -1,7 +1,7 @@
 ---
 title: "Project 1: State Crime"
 author: "Emma Aldred-efa364"
-date: "10/18/2020"
+hidedate: true
 output: 
   html_document:
     toc: yes

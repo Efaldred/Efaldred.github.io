@@ -7,7 +7,7 @@
     <meta name="author" content="Emma Aldred" />
     
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Project2</title>
+    <title>Project 2</title>
     <meta name="generator" content="Hugo 0.79.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -54,16 +54,8 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/project/project2/">Project2</a></strong>
+            <strong><a href="/project/project2/">Project 2</a></strong>
           </h3>
-        </div>
- 
-<div class="blog-title">
-          <h4>
-         January 1, 0001 
-            &nbsp;&nbsp;
-            
-          </h4>
         </div>
 
         <div class="panel panel-default">
@@ -267,8 +259,8 @@ fit&lt;-lm(new_violent~y*prisoners_c,data=Guns)
 coef(fit)
 })
 resid_crimesamp%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
-<pre><code>##   (Intercept)       y prisoners_c y:prisoners_c
-## 1    7.351073 15.1617  0.03979115    0.09421348</code></pre>
+<pre><code>##   (Intercept)        y prisoners_c y:prisoners_c
+## 1    7.587778 15.32722  0.04148885    0.09522059</code></pre>
 <p>Bootstrapping the residuals on the same regression model resulted in all standard errors that were less (and thus p values that were less) than the original model and very similar to the robust standard error output. The bootstrapping standard erros were slighlty lower compared to the robust SE output for the intercept (7.455181), prisoners_c (0.04031502), and the interaction between prisoners_c and y (0.09646994) but higher for the dummy variable y for ‘shall carry’ law (15.17598).</p>
 <p><B>Binary Logistic Regression Model</B> - <em>Prisoners and Violent Crime</em></p>
 <pre class="r"><code>fit2&lt;-glm(y~prisoners_c+violent_c, data=Guns,family=&quot;binomial&quot;)
