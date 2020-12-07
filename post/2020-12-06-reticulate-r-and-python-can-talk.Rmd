@@ -7,7 +7,7 @@ categories: []
 tags: []
 description: ''
 ---
-Reticulate is a great package because it lets you use code across R and python. In essence, it is how R and Python talk! Here are a few examples of how reticulate works:
+Reticulate is a great package because it lets you use code across R and python. In essence, it is how R and Python talk! Here is an example of how reticulate works:
 
 ```{R}
 library(reticulate)
